@@ -1,0 +1,85 @@
+[tool.poetry]
+name = "python_project"
+version = "1.0"
+description = "Template for New Python Project"
+authors = ["ryanleonbutler <ryanleonbutler@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+sphinx = "^4.0.2"
+sphinx_rtd_theme = "^0.5.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+flake8 = "^3.9.2"
+xdoctest = "^0.15.4"
+flake8-docstrings = "^1.6.0"
+pydocstyle = "6.1.1"
+black = {version = "^21.6b0", allow-prereleases = true}
+isort = {version = "^5.8.0", extras = ["pyproject"]}
+seed-isort-config = "^2.2.0"
+pytest-cov = "^2.12.1"
+pytest-mock = "^3.6.1"
+coverage = "^5.5"
+tox = "^3.23.1"
+pre-commit = "^2.13.0"
+toml = "^0.10.2"
+darglint = "^1.8.0"
+docutils = "<0.17"  # temp patch
+mypy = "^0.902"
+
+[tool.poetry.extras]
+doc = ["sphinx", "sphinx_rtd_theme"]
+
+[tool.poetry.scripts]
+python_project = "python_project.cli:python_project"
+
+[tool.black]
+line-length = 119
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+known_first_party = 'python_project'
+known_third_party = ["pytest"]
+multi_line_output = 3
+lines_after_imports = 2
+force_grid_wrap = 0
+combine_as_imports = true
+include_trailing_comma = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = true
+envlist = py39
+[testenv]
+whitelist_externals = poetry
+commands =
+    poetry install -vvv
+    poetry run isort python_project
+    poetry run black python_project
+    poetry run flake8 python_project
+    poetry run mypy python_project --ignore-missing-imports
+    poetry run coverage erase
+    poetry run pytest -ra -v --cov=python_project --cov-report xml
+    poetry run coverage report -m
+"""
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
